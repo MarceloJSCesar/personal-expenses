@@ -3,31 +3,32 @@ import 'package:intl/intl.dart';
 import '../models/transaction.dart';
 import './chart_bar.dart';
 
-class Chart extends StatelessWidget {
+class Chart extends StatefulWidget {
   final List<Transaction> recentTransaction;
   Chart(this.recentTransaction);
 
+  @override
+  _ChartState createState() => _ChartState();
+}
+
+class _ChartState extends State<Chart> {
   List<Map> get groupTransactionValue {
     return List.generate(7, (index) {
       final weekDay = DateTime.now().subtract(Duration(days: index));
       var totalsum = 0.0;
 
-      for (var i = 0; i < recentTransaction.length; i++) {
-        if (recentTransaction[i].date.day == weekDay.day &&
-            recentTransaction[i].date.month == weekDay.month &&
-            recentTransaction[i].date.year == weekDay.year) {
-          totalsum += recentTransaction[i].amount;
+      for (var i = 0; i < widget.recentTransaction.length; i++) {
+        if (widget.recentTransaction[i].date.day == weekDay.day &&
+            widget.recentTransaction[i].date.month == weekDay.month &&
+            widget.recentTransaction[i].date.year == weekDay.year) {
+          totalsum += widget.recentTransaction[i].amount;
         }
       }
-
-      print(DateFormat.E().format(weekDay));
-      print(totalsum);
-
       return {
         'day': DateFormat.E().format(weekDay).substring(0, 1),
         'amount': totalsum
       };
-    }).reversed.toList();
+    });
   }
 
   double get _totalSpendingAmount {
@@ -38,7 +39,6 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(groupTransactionValue);
     return Card(
       elevation: 6,
       margin: EdgeInsets.all(20),
@@ -53,7 +53,9 @@ class Chart extends StatelessWidget {
               child: ChartBar(
                 label: data['day'],
                 spendingAmount: data['amount'],
-                spendingPctOfTotal: _totalSpendingAmount == 0.0 ? 0.0 : (data['amount'] as double) / _totalSpendingAmount,
+                spendingPctOfTotal: _totalSpendingAmount == 0.0
+                    ? 0.0
+                    : (data['amount'] as double) / _totalSpendingAmount,
               ),
             );
           }).toList(),

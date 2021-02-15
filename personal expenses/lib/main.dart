@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:statistic_store/widgets/new_transaction.dart';
 import './models/transaction.dart';
@@ -17,12 +21,13 @@ class MyApp extends StatelessWidget {
       home: MyHomePage(),
       theme: ThemeData(
           primarySwatch: Colors.purple,
+          errorColor: Colors.red,
           textTheme: ThemeData.light().textTheme.copyWith(
-                headline6: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'OpenSans-Regular',
-                    color: Colors.black),
-              ),
+              headline6: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'OpenSans-Regular',
+                  color: Colors.black),
+              button: TextStyle(color: Colors.white)),
           appBarTheme: AppBarTheme(
               centerTitle: true,
               textTheme: ThemeData.light().textTheme.copyWith(
@@ -55,15 +60,17 @@ class _MyHomePageState extends State<MyHomePage> {
     // ),
   ];
 
-  void _addNewTransaction(String txTitle, double txAmount) {
+  void _addNewTransaction(
+      String txTitle, double txAmount, DateTime chosenDate) {
     final txData = Transaction(
         title: txTitle,
         amount: txAmount,
         id: DateTime.now().toString(),
-        date: DateTime.now());
+        date: chosenDate);
 
     setState(() {
       userTransactions.add(txData);
+      // _saveData();
     });
   }
 
@@ -86,6 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,22 +105,15 @@ class _MyHomePageState extends State<MyHomePage> {
           style: Theme.of(context).textTheme.headline6,
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => _startAddNewTransaction(context),
-            color: Colors.black,
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Chart(_recentTransactions),
-              UserTransactions(userTransactions)
-            ]),
-      ),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Chart(_recentTransactions),
+                 UserTransactions(userTransactions)
+              ]),
+        ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         icon: Icon(Icons.add),
@@ -121,4 +122,25 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  // Future<File> _getFile() async {
+  //   final directory = await getApplicationDocumentsDirectory();
+  //   return File('${directory.path}/data.json');
+  // }
+
+  // Future<File> _saveData() async {
+  //   final file = json.encode(userTransactions);
+  //   final data = await _getFile();
+  //   return data.writeAsString(file);
+  // }
+
+  // Future<String> _readData() async {
+  //   try {
+  //     final data = await _getFile();
+  //     return data.readAsString();
+  //   } catch (error) {
+  //     print('error caused by readingDat: $error');
+  //     return null;
+  //   }
+  // }
 }
